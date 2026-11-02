@@ -127,6 +127,14 @@
             android:minHeight="48dp"
             android:text="@string/label_thong_bao" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/swDarkMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
+            android:text="Chế độ tối (Dark Mode)" />
+
         <ToggleButton
             android:id="@+id/tgUuTien"
             android:layout_width="wrap_content"

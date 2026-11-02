@@ -18,6 +18,7 @@ import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -29,7 +30,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    // TODO: thay 2201234567 bằng MSSV của bạn
     private static final String TAG = "A6_231A010596";
 
     public static final String EXTRA_TOM_TAT = "extra_tom_tat";
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spMonHoc;
     private RadioGroup rgHeDaoTao;
     private CheckBox cbSang, cbChieu, cbToi;
-    private MaterialSwitch swThongBao;
+    private MaterialSwitch swThongBao, swDarkMode;
     private ToggleButton tgUuTien;
     private TextView tvDemBuoi;
     private Button btnXacNhan, btnLamLai;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main); // 1. BẮT BUỘC phải gọi setContentView trước khi findViewById
+        setContentView(R.layout.activity_main);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -63,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
         cbChieu = findViewById(R.id.cbChieu);
         cbToi = findViewById(R.id.cbToi);
         swThongBao = findViewById(R.id.swThongBao);
+        swDarkMode = findViewById(R.id.swDarkMode);
         tgUuTien = findViewById(R.id.tgUuTien);
         tvDemBuoi = findViewById(R.id.tvDemBuoi);
         btnXacNhan = findViewById(R.id.btnXacNhan);
         btnLamLai = findViewById(R.id.btnLamLai);
 
-        // ---- Bài nâng cao NC2:đếm số buổi CheckBox ----
         android.widget.CompoundButton.OnCheckedChangeListener demBuoiListener = (buttonView, isChecked) -> {
             int count = 0;
             if (cbSang.isChecked()) count++;
@@ -81,6 +81,14 @@ public class MainActivity extends AppCompatActivity {
         cbSang.setOnCheckedChangeListener(demBuoiListener);
         cbChieu.setOnCheckedChangeListener(demBuoiListener);
         cbToi.setOnCheckedChangeListener(demBuoiListener);
+
+        swDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.mon_hoc, android.R.layout.simple_spinner_item);
@@ -107,12 +115,10 @@ public class MainActivity extends AppCompatActivity {
         swThongBao.setOnCheckedChangeListener((buttonView, isChecked) ->
                 Log.d(TAG, "Nhận thông báo: " + isChecked));
 
-        // Gán sự kiện cho các nút bấm
         btnXacNhan.setOnClickListener(v -> xacNhan());
         btnLamLai.setOnClickListener(v -> lamLai());
     }
 
-    /** Kiểm tra dữ liệu rồi chuyển sang màn hình xác nhận. */
     private void xacNhan() {
         String hoTen = edtHoTen.getText().toString().trim();
         String mssv = edtMssv.getText().toString().trim();
@@ -127,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             edtMssv.requestFocus();
             return;
         }
-        if (rgHeDaoTao.getCheckedRadioButtonId() == -1) {   // -1 = chưa chọn nút nào
+        if (rgHeDaoTao.getCheckedRadioButtonId() == -1) {
             Toast.makeText(this, R.string.err_he, Toast.LENGTH_SHORT).show();
             return;
         }
