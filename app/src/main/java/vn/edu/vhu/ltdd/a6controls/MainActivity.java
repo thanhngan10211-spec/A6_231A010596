@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -29,7 +30,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     // TODO: thay 2201234567 bằng MSSV của bạn
-    private static final String TAG = "A6_2201234567";
+    private static final String TAG = "A6_231A010596";
 
     public static final String EXTRA_TOM_TAT = "extra_tom_tat";
 
@@ -39,12 +40,15 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox cbSang, cbChieu, cbToi;
     private MaterialSwitch swThongBao;
     private ToggleButton tgUuTien;
+    private TextView tvDemBuoi;
+    private Button btnXacNhan, btnLamLai;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main); // 1. BẮT BUỘC phải gọi setContentView trước khi findViewById
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
@@ -60,10 +64,24 @@ public class MainActivity extends AppCompatActivity {
         cbToi = findViewById(R.id.cbToi);
         swThongBao = findViewById(R.id.swThongBao);
         tgUuTien = findViewById(R.id.tgUuTien);
-        Button btnXacNhan = findViewById(R.id.btnXacNhan);
-        Button btnLamLai = findViewById(R.id.btnLamLai);
+        tvDemBuoi = findViewById(R.id.tvDemBuoi);
+        btnXacNhan = findViewById(R.id.btnXacNhan);
+        btnLamLai = findViewById(R.id.btnLamLai);
 
-        // ---- Spinner: đổ dữ liệu từ res/values/arrays.xml bằng ArrayAdapter ----
+        // ---- Bài nâng cao NC2:đếm số buổi CheckBox ----
+        android.widget.CompoundButton.OnCheckedChangeListener demBuoiListener = (buttonView, isChecked) -> {
+            int count = 0;
+            if (cbSang.isChecked()) count++;
+            if (cbChieu.isChecked()) count++;
+            if (cbToi.isChecked()) count++;
+
+            tvDemBuoi.setText("Đã chọn: " + count + " buổi");
+        };
+
+        cbSang.setOnCheckedChangeListener(demBuoiListener);
+        cbChieu.setOnCheckedChangeListener(demBuoiListener);
+        cbToi.setOnCheckedChangeListener(demBuoiListener);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.mon_hoc, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -77,25 +95,19 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Không dùng, nhưng vẫn phải cài đặt vì đây là phương thức của interface
             }
         });
 
-        // ---- CheckBox: lắng nghe thay đổi ----
-        cbToi.setOnCheckedChangeListener((buttonView, isChecked) ->
-                Log.d(TAG, "Buổi Tối: " + (isChecked ? "chọn" : "bỏ chọn")));
-
-        // ---- RadioGroup: chỉ chọn được một ----
         rgHeDaoTao.setOnCheckedChangeListener((group, checkedId) -> {
             String he = (checkedId == R.id.rbChinhQuy) ? getString(R.string.he_chinh_quy)
                     : getString(R.string.he_vlvh);
             Log.d(TAG, "Hệ đào tạo: " + he);
         });
 
-        // ---- Switch ----
         swThongBao.setOnCheckedChangeListener((buttonView, isChecked) ->
                 Log.d(TAG, "Nhận thông báo: " + isChecked));
 
+        // Gán sự kiện cho các nút bấm
         btnXacNhan.setOnClickListener(v -> xacNhan());
         btnLamLai.setOnClickListener(v -> lamLai());
     }
@@ -137,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 mssv,
                 spMonHoc.getSelectedItem().toString(),
                 he,
-                TextUtils.join(", ", buoiHoc),  // String.join() cần API 26 nên dùng TextUtils
+                TextUtils.join(", ", buoiHoc),
                 swThongBao.isChecked() ? getString(R.string.co) : getString(R.string.khong),
                 tgUuTien.isChecked() ? getString(R.string.bat) : getString(R.string.tat));
 
@@ -146,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /** Đưa mọi control về trạng thái ban đầu. */
     private void lamLai() {
         edtHoTen.setText("");
         edtMssv.setText("");
@@ -159,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         cbToi.setChecked(false);
         swThongBao.setChecked(true);
         tgUuTien.setChecked(false);
+        tvDemBuoi.setText("Đã chọn: 0 buổi");
         edtHoTen.requestFocus();
     }
 }
